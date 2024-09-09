@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt">
+   
+<script>
+    function salvarUsuario() {
+
+        // Obter os valores dos campos
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const perfil = document.querySelector('input[name="perfil"]:checked').value;
+
+        // Enviar os dados para a API
+        fetch('/api/cadastrousuario', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email, password, perfil })
+        })
+            .then(response => response.json())
+            .then(data => {
+            // Redirecionar para a página de consulta
+            window.location.href = '/consultausuario.html';
+            })
+            .catch(error => console.error('Erro:', error));
+
+    }
+</script>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro Clientes</title>
+    <link rel="stylesheet" href="cadastrousuario.css">
+</head>
+<body>
+    <div class="navbar">
+        <a href="funcionario.html">Home</a>
+        <a href="consultacliente.html">Cliente</a>
+        <a href="animal.html">Animal</a>
+        <a href="agenda.html">Agenda</a>
+        <a href="consultausuario.html">Usuário</a>
+    </div>
+
+    <h1>USUÁRIOS</h1>
+
+    <div class="container">
+        <div class="form-box">
+            <h2>Cadastro de Usuários</h2>
+            <form>
+
+                <label for="username">Nome Completo</label>
+                <input type="text" id="username" name="username" required>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email">
+
+                <label for="password">Senha</label>
+                <input type="password" id="password" name="password" required>
+<br/>    
+                <label>Perfil:</label>
+                <div>
+                    <input type="radio" id="cliente" name="perfil" value="cliente" required>
+                    <label for="cliente">Cliente</label>
+                </div>
+                <div>
+                    <input type="radio" id="funcionario" name="perfil" value="funcionario" required>
+                    <label for="funcionario">Funcionário</label>
+                </div>
+                <div>
+                    <input type="radio" id="admin" name="perfil" value="admin" required>
+                    <label for="admin">Admin</label>
+                </div>
+
+                <button onclick="salvarUsuario()">Salvar</button><button type="reset" onclick="window.location.href='consultausuario.html'">Cancelar</button>
+                
+            </form>
+        </div>
+    </div>
+</body>
+</html>

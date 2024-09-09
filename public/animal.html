@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamentos</title>
+    <link rel="stylesheet" href="animal.css">
+</head>
+<body>
+    <div class="navbar">
+        <a href="funcionario.html">Home</a>
+        <a href="consultacliente.html">Cliente</a>
+        <a href="animal.html">Animal</a>
+        <a href="agenda.html">Agenda</a>
+    </div>
+
+    <h1>ANIMAL</h1>
+
+    <table align="center">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Tipo</th>
+                <th>Porte</th>
+                <th>Raça</th>
+                <th>Ações</th>
+            </tr>
+        </thead> 
+        <tbody>
+            <tr>
+                <td>Totó</td>
+                <td>Cachorro</td>
+                <td>Grande</td>
+                <td>SRD</td>
+                <td>
+                    <div class="btn-acoes">
+                        <button class="btn-editar">
+                            <img src="pencil.png" alt="Editar">
+                        </button>
+                        <button class="btn-excluir">
+                            <img src="trash.png" alt="Excluir">
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Nonis</td>
+                <td>Gato</td>
+                <td>Médio</td>
+                <td>SRD</td>
+                <td>
+                    <div class="btn-acoes">
+                        <button class="btn-editar">
+                            <img src="pencil.png" alt="Editar">
+                        </button>
+                        <button class="btn-excluir">
+                            <img src="trash.png" alt="Excluir">
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Lolo</td>
+                <td>Passárinho</td>
+                <td>Pequeno</td>
+                <td>Calopsita</td>
+                <td>
+                    <div class="btn-acoes">
+                        <button class="btn-editar">
+                            <img src="pencil.png" alt="Editar">
+                        </button>
+                        <button class="btn-excluir">
+                            <img src="trash.png" alt="Excluir">
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>    
+    </table>
+    <div class="botao">
+        <button class="botao" type="submit" onclick="window.location.href='cadastroanimal.html'">Adicionar Animal</button>
+     </div>
+</body>
+</html>

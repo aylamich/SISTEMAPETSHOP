@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="petshop.css">
+</head>
+<body>
+    <div class="container">
+        <div class="login">
+            <h2>Entrar</h2>
+            <form id="loginForm">
+                <label for="username">Nome de usuário ou e-mail</label>
+                <input type="text" id="username" name="username" required>
+
+                <label for="password">Senha</label>
+                <input type="password" id="password" name="password" required>
+
+                <button type="submit">Acessar</button>
+            </form>
+        </div>
+        <script>
+            document.getElementById("loginForm").onsubmit = function(event) {
+                event.preventDefault(); // pra nao enviar o formulario vazio
+    
+                // validação 
+                const username = document.getElementById("username").value;
+                const password = document.getElementById("password").value;
+    
+                if (username && password) {
+                    if (username == 'admin'){
+                        window.location.href = "admin.html";
+                    } else if (username == 'cliente'){
+                        window.location.href = "cliente.html";
+                    } else {
+                        window.location.href = "funcionario.html";
+                    }
+                } else {
+                    alert("Por favor, preencha todos os campos.");
+
+                }
+            };
+        </script>
+</body>
+</html>        

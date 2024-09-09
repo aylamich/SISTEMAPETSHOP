@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<script>
+    function salvarAgenda() {
+            
+            // Obter os valores dos campos
+            const cliente = document.getElementById('cliente').value;
+            const data = document.getElementById('data').value;
+            const animal = document.getElementById('animal').value;
+            const timeInput1 = document.getElementById('time-input1').value;
+            const timeInput2 = document.getElementById('time-input2').value;
+            const obs = document.getElementById('obs').value;
+    
+            // Enviar os dados para a API
+            fetch('/api/agenda', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cliente, data, animal, timeInput1, timeInput2, obs })
+            })
+                .then(response => response.json())
+                .then(data => {
+                // Redirecionar para a página de consulta
+                window.location.href = '/funcionario.html';
+                })
+                .catch(error => console.error('Erro:', error));
+    }
+</script>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro Clientes</title>
+    <link rel="stylesheet" href="agenda.css">
+</head>
+<body>
+    <div class="navbar">
+        <a href="funcionario.html">Home</a>
+        <a href="consultacliente.html">Cliente</a>
+        <a href="animal.html">Animal</a>
+        <a href="agenda.html">Agenda</a>
+    </div>
+
+    <h1>AGENDAMENTO</h1>
+
+    <div class="container">
+        <div class="form-box">
+            <form>
+                <label for="cliente">Cliente:</label> 
+                <div id="cliente" class="input-container">
+                    <input type="text">
+                    <button class="procurar">
+                        <img src="search.png" alt="Buscar" width="17px">
+                    </button>
+                </div>
+
+                <label for="data">Escolhe uma data:</label>
+                <input type="date" id="data" name="data"> 
+<br/><br/>                
+                   
+
+                <label for="animal">Animal:</label>
+                <select id="animal" name="animal">
+                    <option value="" selected>Selecione um animal</option>
+                    <option value="Toto">Toto</option>
+                    <option value="Nonis">Nonis</option>
+                    <option value="Lolo">Lolo</option>
+                </select>
+<br/><br/>                   
+
+                <label for="time-input">Horário entrado:</label>
+                <input type="time" id="time-input1" class="time-input">
+<br/><br/>   
+
+                <label for="time-input">Horário previsto término:</label>
+                <input type="time" id="time-input2" class="time-input">
+<br/><br/>   
+
+                <label for="obs">Serviços:</label>
+                <textarea id="obs" name="obs"></textarea>
+                <br/>
+
+                <button onclick="salvarAgenda()">Salvar</button><button type="reset" onclick="window.location.href='funcionario.html'">Cancelar</button>
+                
+            </form>
+        </div>
+    </div>
+</body>
+</html>
