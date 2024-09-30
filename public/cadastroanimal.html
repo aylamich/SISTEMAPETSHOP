@@ -12,6 +12,8 @@
         const cor = document.getElementById('cor').value;
         const obs = document.getElementById('obs').value;
 
+        console.log(nome, tipo, porte, sexo, cor, obs);
+
        
         // Enviar os dados para a API
                
@@ -23,7 +25,7 @@
             .then(response => response.json())
             .then(data => {
             // Redirecionar para a página de consulta
-            window.location.href = '/animal.html';
+            window.location.href = '/consultaanimal.html';
             })
             .catch(error => console.error('Erro:', error));
 
@@ -52,7 +54,7 @@
     <div class="navbar">
         <a href="funcionario.html">Home</a>
         <a href="consultacliente.html">Cliente</a>
-        <a href="animal.html">Animal</a>
+        <a href="consultaanimal.html">Animal</a>
         <a href="agenda.html">Agenda</a>
     </div>
 
@@ -97,7 +99,7 @@
                 <textarea id="obs" name="obs"></textarea>
                 <br/>
 
-                <button onclick="salvarAnimal()">Salvar</button><button type="reset" onclick="window.location.href='animal.html'">Cancelar</button>
+                <button onclick="salvarAnimal()">Salvar</button><button type="reset" onclick="window.location.href='consultaanimal.html'">Cancelar</button>
                 
             </form>
         </div>

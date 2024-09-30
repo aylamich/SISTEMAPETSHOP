@@ -1,5 +1,86 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt">    
+
+<script>
+    function excluirCliente(id) {
+        
+        fetch('/api/excluircliente', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id })
+        }).then(response => response.json()).then(data => {
+            window.location.reload(); // Recarrega a página
+                alert('Cliente excluído com sucesso!');        
+        }).catch(error => console.error('Erro:', error));
+    }
+    function consultaCliente() {
+    
+        fetch('/api/consultacliente', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({  })
+        })
+            .then(response => response.json()).then(data => {
+                console.log(data);
+
+                data[0].forEach(cliente => {
+                   // const li = document.createElement('li');
+                  //  li.textContent = `${animal.nome} - ${animal.idade} anos`;
+                  //  listaAnimais.appendChild(li);
+
+                  console.log(cliente.id)
+                  console.log(cliente.nomeCompleto)
+                  console.log(cliente.contato)
+                  console.log(cliente.email)
+                  console.log(cliente.rua)
+                  console.log(cliente.numero)
+                  console.log(cliente.bairro)
+                  console.log(cliente.cep)
+                  console.log(cliente.uf)
+
+                  const tabelaCliente = document.getElementById('tabelaCliente').getElementsByTagName('tbody')[0];
+
+                  const row = tabelaCliente.insertRow();  // Cria uma nova linha
+
+                  // Cria e insere células na linha
+                  const cellNome = row.insertCell(0);
+                  const cellContato = row.insertCell(1);
+                  const cellEndereco = row.insertCell(2);
+                  const cellAcao = row.insertCell(3);
+
+                  
+                  // Preenche as células com os dados retornados
+                  cellNome.textContent = cliente.nomeCompleto;
+                  cellContato.textContent = cliente.contato;
+                  cellEndereco.textContent = cliente.rua + ' - ' + cliente.numero + ' - ' + cliente.bairro + ' - ' + cliente.cep + ' - ' + cliente.uf;
+                 
+                  const btnEditar = document.createElement('button');
+                  btnEditar.textContent = 'Editar';
+                  btnEditar.className = 'btn-editar';
+              
+                  // Botão de excluir
+                  const btnExcluir = document.createElement('button');
+                  btnExcluir.textContent = 'Excluir';
+                  btnExcluir.className = 'btn-excluir';
+                  btnExcluir.addEventListener('click', () => {
+                    excluirCliente(cliente.id); // Chama a função com o nome do cliente
+                });
+              
+                  // Adiciona os botões à célula de ação
+                  cellAcao.appendChild(btnEditar);
+                  cellAcao.appendChild(btnExcluir);
+          
+                  });
+            })
+            .catch(error => console.error('Erro:', error));
+
+    }
+    
+    document.addEventListener('DOMContentLoaded', function () {
+        consultaCliente();
+      });
+</script>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,12 +91,12 @@
     <div class="navbar">
         <a href="funcionario.html">Home</a>
         <a href="consultacliente.html">Cliente</a>
-        <a href="animal.html">Animal</a>
+        <a href="consultaanimal.html">Animal</a>
         <a href="agenda.html">Agenda</a>
     </div>
 
         <h2>CLIENTES</h2>
-        <table align="center">
+        <table align="center" id="tabelaCliente">
             <thead>
                 <tr>
                     <th>Nome</th>
@@ -25,51 +106,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>João Silva</td>
-                    <td>(47)3256-3876</td>
-                    <td>Rua santa fe, Bairro Jesus - Londrina PR</td>
-                    <td>
-                        <div class="btn-acoes">
-                            <button class="btn-editar">
-                                <img src="pencil.png" alt="Editar">
-                            </button>
-                            <button class="btn-excluir">
-                                <img src="trash.png" alt="Excluir">
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Maria Gonça</td>
-                    <td>(30)2345-7654</td>
-                    <td>Rua felicidade, Bairro Rio - Florianópolis SC</td>
-                    <td>
-                        <div class="btn-acoes">
-                            <button class="btn-editar">
-                                <img src="pencil.png" alt="Editar">
-                            </button>
-                            <button class="btn-excluir">
-                                <img src="trash.png" alt="Excluir">
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Pedro Lima</td>
-                    <td>(28)3799-8765</td>
-                    <td>Rua São Jorge, Barro Nascimento - Porto Alegre RS</td>
-                    <td>
-                        <div class="btn-acoes">
-                            <button class="btn-editar">
-                                <img src="pencil.png" alt="Editar">
-                            </button>
-                            <button class="btn-excluir">
-                                <img src="trash.png" alt="Excluir">
-                            </button>
-                        </div>
-                    </td>
-                </tr>
+                
             </tbody>
         </table>
         <div class="botao">

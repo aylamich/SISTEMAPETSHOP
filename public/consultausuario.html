@@ -1,5 +1,81 @@
 <!DOCTYPE html>
 <html lang="pt">
+
+<script>
+    function excluirUsuario(id) {
+        
+        fetch('/api/excluirusuario', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id })
+        }).then(response => response.json()).then(data => {
+            window.location.reload(); // Recarrega a página
+                alert('usuario excluído com sucesso!');        
+        }).catch(error => console.error('Erro:', error));
+    }
+    function consultaUsuario() {
+    
+        fetch('/api/consultausuario', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({  })
+        })
+            .then(response => response.json()).then(data => {
+                console.log(data[0]);
+
+                data[0].forEach(usuario => {
+
+                  console.log(usuario.nomeCompleto)
+                  console.log(usuario.email)
+                  console.log(usuario.senha)
+                  console.log(usuario.tipoCliente)
+                  // console.log(usuario.idCliente)
+                 
+            
+                  
+
+                  const tabelaUsuario = document.getElementById('tabelaUsuario').getElementsByTagName('tbody')[0];
+
+                  const row = tabelaUsuario.insertRow();  // Cria uma nova linha
+
+                  // Cria e insere células na linha
+                  const cellNomeCompleto = row.insertCell(0);
+                  const cellEmail = row.insertCell(1);
+                  const cellTipoCliente = row.insertCell(2);
+                  const cellAcao = row.insertCell(3);
+
+                  
+                  // Preenche as células com os dados retornados
+                  cellNomeCompleto.textContent = usuario.nomeCompleto;
+                  cellEmail.textContent = usuario.email;
+                  cellTipoCliente.textContent = usuario.tipoCliente;
+                 
+                  const btnEditar = document.createElement('button');
+                  btnEditar.textContent = 'Editar';
+                  btnEditar.className = 'btn-editar';
+              
+                  // Botão de excluir
+                  const btnExcluir = document.createElement('button');
+                  btnExcluir.textContent = 'Excluir';
+                  btnExcluir.className = 'btn-excluir';
+                  btnExcluir.addEventListener('click', () => {
+                    excluirUsuario(usuario.id);
+                });
+              
+                  // Adiciona os botões à célula de ação
+                  cellAcao.appendChild(btnEditar);
+                  cellAcao.appendChild(btnExcluir);
+          
+                  });
+            })
+            .catch(error => console.error('Erro:', error));
+    }
+    
+    document.addEventListener('DOMContentLoaded', function () {
+        consultaUsuario();
+      });
+</script>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,13 +86,13 @@
     <div class="navbar">
         <a href="funcionario.html">Home</a>
         <a href="consultacliente.html">Cliente</a>
-        <a href="animal.html">Animal</a>
+        <a href="consultaanimal.html">Animal</a>
         <a href="agenda.html">Agenda</a>
         <a href="consultausuario.html">Usuário</a>
     </div>
 
         <h2>USUÁRIOS</h2>
-        <table align="center">
+        <table align="center" id="tabelaUsuario">
             <thead>
                 <tr>
                     <th>Nome</th>
@@ -26,51 +102,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>Ana Paula</td>
-                    <td>anapaula@gmail.com</td>
-                    <td>Funcionário</td>
-                    <td>
-                        <div class="btn-acoes">
-                            <button class="btn-editar">
-                                <img src="pencil.png" alt="Editar">
-                            </button>
-                            <button class="btn-excluir">
-                                <img src="trash.png" alt="Excluir">
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Cleiton Salve</td>
-                    <td>cleitinho@gmail.com</td>
-                    <td>Admin</td>
-                    <td>
-                        <div class="btn-acoes">
-                            <button class="btn-editar">
-                                <img src="pencil.png" alt="Editar">
-                            </button>
-                            <button class="btn-excluir">
-                                <img src="trash.png" alt="Excluir">
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Catarina Ameli</td>
-                    <td>donacat@gmail.com</td>
-                    <td>Cliente</td>
-                    <td>
-                        <div class="btn-acoes">
-                            <button class="btn-editar">
-                                <img src="pencil.png" alt="Editar">
-                            </button>
-                            <button class="btn-excluir">
-                                <img src="trash.png" alt="Excluir">
-                            </button>
-                        </div>
-                    </td>
-                </tr>
+                
             </tbody>
         </table>
         <div class="botao">

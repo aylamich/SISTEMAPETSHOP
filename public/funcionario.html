@@ -1,5 +1,87 @@
 <!DOCTYPE html>
 <html lang="pt">
+
+<script>
+    function excluirAgenda(id) {
+        
+        fetch('/api/excluiragenda', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id })
+        }).then(response => response.json()).then(data => {
+            window.location.reload(); // Recarrega a página
+                alert('agendamento excluído com sucesso!');        
+        }).catch(error => console.error('Erro:', error));
+    }
+    function consultaAgenda() {
+    
+        fetch('/api/consultaagenda', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({  })
+        })
+            .then(response => response.json()).then(data => {
+                console.log(data[0]);
+
+                data[0].forEach(agendar => {
+
+                 // console.log(agendar.id)
+                 // console.log(agendar.idAnimal)
+                  console.log(agendar.dataAgenda)
+                  console.log(agendar.horarioInicio)
+                  console.log(agendar.horarioFim)
+                 // console.log(agendar.idServicos)
+                  
+                  
+
+                  const tabelaAgendar = document.getElementById('tabelaAgendar').getElementsByTagName('tbody')[0];
+
+                  const row = tabelaAgendar.insertRow();  // Cria uma nova linha
+
+                  // Cria e insere células na linha
+                  const cellCliente = row.insertCell(0);
+                  const cellAnimal = row.insertCell(1);
+                  const cellDataAgenda = row.insertCell(2);
+                  const cellHorarioInicio = row.insertCell(3);
+                  const cellHorarioFim = row.insertCell(4);
+                  const cellStatus = row.insertCell(5);
+                  const cellAcao = row.insertCell(6);
+
+                  
+                  // Preenche as células com os dados retornados
+                  cellCliente.textContent = "";
+                  cellAnimal.textContent = "";
+                  cellDataAgenda.textContent = agendar.dataAgenda;
+                  cellHorarioInicio.textContent = agendar.horarioInicio;
+                  cellHorarioFim.textContent = agendar.horarioFim;
+                  cellStatus.textContent = "";
+                 
+                  const btnEditar = document.createElement('button');
+                  btnEditar.textContent = 'Editar';
+                  btnEditar.className = 'btn-editar';
+              
+                  // Botão de excluir
+                  const btnExcluir = document.createElement('button');
+                  btnExcluir.textContent = 'Excluir';
+                  btnExcluir.className = 'btn-excluir';
+                  btnExcluir.addEventListener('click', () => {
+                    excluirAgenda(agendar.id); // Chama a função com o nome do cliente
+                });
+              
+                  // Adiciona os botões à célula de ação
+                  cellAcao.appendChild(btnEditar);
+                  cellAcao.appendChild(btnExcluir);
+          
+                  });
+            })
+            .catch(error => console.error('Erro:', error));
+    }
+    
+    document.addEventListener('DOMContentLoaded', function () {
+        consultaAgenda();
+      });
+</script>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,13 +92,13 @@
     <div class="navbar">
         <a href="funcionario.html">Home</a>
         <a href="consultacliente.html">Cliente</a>
-        <a href="animal.html">Animal</a>
+        <a href="consultaanimal.html">Animal</a>
         <a href="agenda.html">Agenda</a>
     </div>
 
     <h1>AGENDAMENTOS</h1>
 
-    <table>
+    <table id="tabelaAgendar">
         <thead>
             <tr>
                 <th>Cliente</th>
@@ -30,67 +112,7 @@
         </thead> 
         <tbody>
             <tr>
-                <td>João Silva</td>
-                <td>Cachorro</td>
-                <td>14/09/2024</td>
-                <td>13:00</td>
-                <td>13:25</td>
-                <td>Em andamento</td>
-                <td>
-                    <div class="btn-acoes">
-                        <button class="btn-atualizar">
-                            <img src="clock-cog.png" alt="Atualizar">
-                        </button>
-                        <button class="btn-editar">
-                            <img src="pencil.png" alt="Editar">
-                        </button>
-                        <button class="btn-excluir">
-                            <img src="trash.png" alt="Excluir">
-                        </button>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>Maria Gonça</td>
-                <td>Gato</td>
-                <td>18/09/2024</td>
-                <td>16:30</td>
-                <td>17:00</td>
-                <td>Aguardando Inicio</td>
-                <td>
-                    <div class="btn-acoes">
-                        <button class="btn-atualizar">
-                            <img src="clock-cog.png" alt="Atualizar">
-                        </button>
-                        <button class="btn-editar">
-                            <img src="pencil.png" alt="Editar">
-                        </button>
-                        <button class="btn-excluir">
-                            <img src="trash.png" alt="Excluir">
-                        </button>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>Pedro Lima</td>
-                <td>Passárinho</td>
-                <td>20/09/2024</td>
-                <td>10:00</td>
-                <td>10:45</td>
-                <td>Aguardando Inicio</td>
-                <td>
-                    <div class="btn-acoes">
-                        <button class="btn-atualizar">
-                            <img src="clock-cog.png" alt="Atualizar">
-                        </button>
-                        <button class="btn-editar">
-                            <img src="pencil.png" alt="Editar">
-                        </button>
-                        <button class="btn-excluir">
-                            <img src="trash.png" alt="Excluir">
-                        </button>
-                    </div>
-                </td>
+                
             </tr>
         </tbody>    
     </table>

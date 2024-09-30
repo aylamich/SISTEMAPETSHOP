@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<script>
+    function excluirAnimal(id) {
+        
+        fetch('/api/excluiranimal', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id })
+        }).then(response => response.json()).then(data => {
+            window.location.reload(); // Recarrega a página
+                alert('animal excluído com sucesso!');        
+        }).catch(error => console.error('Erro:', error));
+    }
+    function consultaAnimal() {
+    
+        fetch('/api/consultaanimal', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({  })
+        })
+            .then(response => response.json()).then(data => {
+                console.log(data[0]);
+
+                data[0].forEach(animal => {
+                   // const li = document.createElement('li');
+                  //  li.textContent = `${animal.nome} - ${animal.idade} anos`;
+                  //  listaAnimais.appendChild(li);
+
+                  console.log(animal.id)
+                  console.log(animal.nome)
+                  console.log(animal.tipo)
+                  console.log(animal.porte)
+                  console.log(animal.sexo)
+                  console.log(animal.observacoes)
+                  // console.log(animal.idCliente) esse ainda nao tem
+                  
+
+                  const tabelaAnimal = document.getElementById('tabelaAnimal').getElementsByTagName('tbody')[0];
+
+                  const row = tabelaAnimal.insertRow();  // Cria uma nova linha
+
+                  // Cria e insere células na linha
+                  const cellNome = row.insertCell(0);
+                  const cellTipo = row.insertCell(1);
+                  const cellPorte = row.insertCell(2);
+                  const cellSexo = row.insertCell(3);
+                  const cellAcao = row.insertCell(4);
+
+                  
+                  // Preenche as células com os dados retornados
+                  cellNome.textContent = animal.nome;
+                  cellTipo.textContent = animal.tipo;
+                  cellPorte.textContent = animal.porte;
+                  cellSexo.textContent = animal.sexo;
+                 
+                  const btnEditar = document.createElement('button');
+                  btnEditar.textContent = 'Editar';
+                  btnEditar.className = 'btn-editar';
+              
+                  // Botão de excluir
+                  const btnExcluir = document.createElement('button');
+                  btnExcluir.textContent = 'Excluir';
+                  btnExcluir.className = 'btn-excluir';
+                  btnExcluir.addEventListener('click', () => {
+                    excluirAnimal(animal.id); // Chama a função com o nome do cliente
+                });
+              
+                  // Adiciona os botões à célula de ação
+                  cellAcao.appendChild(btnEditar);
+                  cellAcao.appendChild(btnExcluir);
+          
+                  });
+            })
+            .catch(error => console.error('Erro:', error));
+    }
+    
+    document.addEventListener('DOMContentLoaded', function () {
+        consultaAnimal();
+      });
+</script>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamentos</title>
+    <link rel="stylesheet" href="consultaanimal.css">
+</head>
+<body>
+    <div class="navbar">
+        <a href="funcionario.html">Home</a>
+        <a href="consultacliente.html">Cliente</a>
+        <a href="consultaanimal.html">Animal</a>
+        <a href="agenda.html">Agenda</a>
+    </div>
+
+    <h1>ANIMAL</h1>
+
+    <table align="center" id="tabelaAnimal">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Tipo</th>
+                <th>Porte</th>
+                <th>Sexo</th>
+                <th>Ações</th>
+            </tr>
+        </thead> 
+        <tbody>
+           
+        </tbody>    
+    </table>
+    <div class="botao">
+        <button class="botao" type="submit" onclick="window.location.href='cadastroanimal.html'">Adicionar Animal</button>
+     </div>
+</body>
+</html>
