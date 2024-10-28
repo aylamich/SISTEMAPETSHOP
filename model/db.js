@@ -27,7 +27,7 @@ async function login(usuario, senha){
     return resultado;
 }
 
-async function cadastrarCliente(nome, contato, email, uf, idCidade, rua, numero, bairro, cep, criarUsuario){    
+async function cadastrarCliente(nome, contato, email, uf, idCidade, rua, numero, bairro, cep){    
 
      const conn = await connect();
      const sql = "INSERT INTO Cliente (nomeCompleto, contato, email, rua, numero, bairro, cep, uf, idCidade) values (?, ?, ?, ?, ?, ?, ?, ?, ?) "; 
@@ -41,7 +41,7 @@ async function cadastrarCliente(nome, contato, email, uf, idCidade, rua, numero,
                        });
 }
 
-async function alterarcliente(idCliente, nome, contato, email, uf, idCidade, rua, numero, bairro, cep, criarUsuario){    
+async function alterarcliente(idCliente, nome, contato, email, uf, idCidade, rua, numero, bairro, cep){    
 
     const conn = await connect();
     const sql = "UPDATE Cliente SET nomeCompleto = ? , contato  = ? , email = ? , rua = ? , numero = ? , bairro = ? , cep = ? , uf = ? , idCidade = ? WHERE id = ? "; 
@@ -71,7 +71,10 @@ async function consultaCliente(paginaAtual, registrosPorPagina){
                     Cliente c, 
                     cidade ci 
                 WHERE 
-                    c.idCidade = ci.id `;
+                    c.idCidade = ci.id 
+                    
+                ORDER BY 
+                    c.nomeCompleto ASC`;    ;
 
         let values = [];            
         if (paginaAtual != null && registrosPorPagina != null) {
@@ -104,7 +107,9 @@ async function consultaClientePorId(id){
                 '    Cliente c, ' +                 
                 '    cidade ci ' +
                 ' WHERE ' +
-                '    c.idCidade = ci.id AND c.id = ? '; 
+                '    c.idCidade = ci.id AND c.id = ? ' +
+                'ORDER BY' +
+                '    c.nomeCompleto ASC'; 
 
     let resultado = await conn.query(sql, [id]);
     return resultado;
@@ -350,7 +355,7 @@ async function agendar (idAnimal, data, timeInput1, timeInput2, idServico, statu
 } 
 
 async function consultaAgenda( paginaAtual, registrosPorPagina, idCliente){    
-    console.log("Chegou no consultaAgenda");
+    //console.log("Chegou no consultaAgenda");
 
     const conn = await connect();
     let sql = `
@@ -390,7 +395,7 @@ async function consultaAgenda( paginaAtual, registrosPorPagina, idCliente){
                     values = [idCliente];
                 }
 
-                console.log(sql, values);
+                //console.log(sql, values);
 
                 
 

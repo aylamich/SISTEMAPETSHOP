@@ -51,13 +51,12 @@ h1 {
 .form-box label {
     display: inline-block;
     margin-bottom: 5px;
-    color: #555;
-    
+    color: #555
 }
 
 .form-box input[type="text"],
 .form-box input[type="email"] {
-    width: 100%;
+    width: 98%;
     padding: 8px;
     margin-bottom: 15px;
     border: 1px solid #ccc;

@@ -23,8 +23,9 @@ app.post('/api/login', async (req, res) => {
 });
 
 app.post('/api/cadastrocliente', (req, res) => {
-    const {nome, contato, email, uf, idCidade, rua, numero, bairro, cep, criarUsuario} = req.body;
-    /*console.log(nome);
+    console.log("Chegou no cadastro cliente");
+    const {nome, contato, email, uf, idCidade, rua, numero, bairro, cep} = req.body;
+    console.log(nome);
     console.log(contato);
     console.log(email);
     console.log(uf);
@@ -33,19 +34,19 @@ app.post('/api/cadastrocliente', (req, res) => {
     console.log(numero);
     console.log(bairro);
     console.log(cep);
-    console.log(criarUsuario);*/
 
-    db.cadastrarCliente(nome, contato, email, uf, idCidade, rua, numero, bairro, cep, criarUsuario);
+    db.cadastrarCliente(nome, contato, email, uf, idCidade, rua, numero, bairro, cep);
     
     res.send(`Nome: ${nome}`);
   });
 
   app.post('/api/alterarcliente', (req, res) => {
-    const {idCliente, nome, contato, email, uf, idCidade, rua, numero, bairro, cep, criarUsuario} = req.body;
+    const {idCliente, nome, contato, email, uf, idCidade, rua, numero, bairro, cep} = req.body;
     
-    db.alterarcliente(idCliente, nome, contato, email, uf, idCidade, rua, numero, bairro, cep, criarUsuario);
+    db.alterarcliente(idCliente, nome, contato, email, uf, idCidade, rua, numero, bairro, cep);
     
     res.send(`Nome: ${nome}`);
+
   });
 
   app.post('/api/excluircliente', async (req, res) => {
@@ -72,7 +73,7 @@ app.post('/api/cadastrocliente', (req, res) => {
     const {id} = req.body;
 
     let resultado = await db.consultaClientePorId(id); 
-    //console.log(resultado);
+    console.log(resultado);
     res.send(resultado);
   });
 

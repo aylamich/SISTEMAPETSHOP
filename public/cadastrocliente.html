@@ -43,24 +43,24 @@
         const numero = document.getElementById('numero').value;
         const bairro = document.getElementById('bairro').value;
         const cep = document.getElementById('cep').value;
-        const criarUsuario = document.getElementById('criar-usuario').checked;
+
+        alert('nome: ' + nome + ' contato: ' + contato + ' email: ' + email + ' uf: ' + uf + ' cidade: ' + idCidade + ' rua: ' + rua + ' numero: ' + numero + ' bairro: ' + bairro + ' cep: ' + cep);
         
         if(idCliente != null && idCliente != ''){
             fetch('/api/alterarcliente', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ idCliente, nome, contato, email, uf, idCidade, rua, numero, bairro, cep, criarUsuario })
+                body: JSON.stringify({ idCliente, nome, contato, email, uf, idCidade, rua, numero, bairro, cep})
             }).then(data => {
                     window.location.href = '/consultacliente.html';
-                })
-                .catch(error => console.error('Erro:', error));
+            }).catch(error => console.error('Erro:', error));
             return;
 
         } else {
             fetch('/api/cadastrocliente', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nome, contato, email, uf, idCidade, rua, numero, bairro, cep, criarUsuario })
+                body: JSON.stringify({ nome, contato, email, uf, idCidade, rua, numero, bairro, cep })
             }).then(data => {
                     alert('Cliente cadastrado com sucesso!')
                 window.location.href = 'consultacliente.html';
@@ -255,14 +255,9 @@
                 oninput="setCustomValidity('')">
 
                 <label for="cep">CEP*:</label>
-                <input type="text" id="cep" name="cep" placeholder="000.000.000-00" required maxlength="14"
+                <input type="text" id="cep" name="cep" placeholder="00000-000" required maxlength="14"
                 oninvalid="this.setCustomValidity('Por favor, preencha este campo com o CEP do cliente.')"
                 oninput="setCustomValidity('')">
-
-                <div class="checkbox">
-                    <input type="checkbox" id="criar-usuario" name="criar-usuario">
-                    <label for="criar-usuario">Criar usuário</label>
-                </div>
 
                 <button type="submit">Salvar</button><button type="reset" onclick="window.location.href='consultacliente.html'">Cancelar</button>
                 
