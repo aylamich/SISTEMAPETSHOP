@@ -2,44 +2,145 @@
 <html lang="pt">
 
 <script>
-    function salvarAnimal() {
+    function consultaCliente() {
+   
+        fetch('/api/consultacliente', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({  })
+        })
+            .then(response => response.json()).then(data => {
+                console.log(data);
 
+                const comboBoxCliente = document.getElementById('cbcliente');
+
+                data[0].forEach(cliente => {
+                   // const li = document.createElement('li');
+                  //  li.textContent = `${animal.nome} - ${animal.idade} anos`;
+                  //  listaAnimais.appendChild(li);
+
+                  console.log(cliente.id)
+                  console.log(cliente.nomeCompleto)
+                  console.log(cliente.contato)
+                  console.log(cliente.email)
+                  console.log(cliente.rua)
+                  console.log(cliente.numero)
+                  console.log(cliente.bairro)
+                  console.log(cliente.cep)
+                  console.log(cliente.uf)  
+
+                  const option = document.createElement('option');
+                  option.value = cliente.id;
+                  option.text =  cliente.nomeCompleto;  //cliente.nomeCompleto;
+                  comboBoxCliente.appendChild(option);  
+
+          
+                  });
+            })
+            .catch(error => console.error('Erro:', error));
+
+    }
+    
+        
+    function salvarAnimal() {
+        
         // Obter os valores dos campos
+        const idAnimal = document.getElementById('idAnimal').value;
         const nome = document.getElementById('nome').value;
         const tipo = document.getElementById('tipo').value;
         const porte = document.getElementById('porte').value;
         const sexo = document.getElementById('sexo').value;
         const cor = document.getElementById('cor').value;
         const obs = document.getElementById('obs').value;
+        const idCliente = document.getElementById('cbcliente').value;
+        // console.log(nome, tipo, porte, sexo, cor, obs, idCliente);
 
-        console.log(nome, tipo, porte, sexo, cor, obs);
 
        
-        // Enviar os dados para a API
-               
-        fetch('/api/cadastroanimal', {
+        if(idAnimal != null && idAnimal != ''){
+            alert('nome: ' + nome);
+            fetch('/api/alteraranimal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ idAnimal, nome, tipo, porte, sexo, cor, obs, idCliente })
+                                       
+            }).then(data => {
+                    window.location.href = '/consultaanimal.html';
+                }).catch(error => alert('Ocorreu um erro ao alterar o animal!'));
+            return;
+
+        } else {
+            
+            fetch('/api/cadastroanimal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({nome, tipo, porte, sexo, cor, obs, idCliente })                            
+            }).then(data => {                    
+                alert('Animal cadastrado com sucesso!')
+                window.location.href = 'consultaanimal.html';
+            }).catch(error => alert('Ocorreu um erro ao cadastrar o animal!'));
+        }
+
+    }
+
+    function editarAnimal(id) {
+        fetch('/api/editaranimal', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nome, tipo, porte, sexo, cor, obs })
+            body: JSON.stringify({ id })
         })
             .then(response => response.json())
             .then(data => {
-            // Redirecionar para a página de consulta
-            window.location.href = '/consultaanimal.html';
+                // Preencher os campos da tela cliente
+                document.getElementById('cbcliente').value = data[0][0].idCliente;
+                document.getElementById('nome').value = data[0][0].nomeAnimal;
+                document.getElementById('tipo').value = data[0][0].tipo;
+                document.getElementById('porte').value = data[0][0].porte;
+                document.getElementById('sexo').value = data[0][0].sexo;
+                document.getElementById('cor').value = data[0][0].cor;
+                document.getElementById('obs').value = data[0][0].observacoes;
+
             })
             .catch(error => console.error('Erro:', error));
-
     }
-    document.getElementById('chamarApi').addEventListener('click', () => {
-      // Fazer a chamada à API usando fetch
-      fetch('/api/mensagem')
-        .then(response => response.json())
-        .then(data => {
-          // Mostrar a resposta no parágrafo
-          document.getElementById('resposta').innerText = data.mensagem;
-        })
-        .catch(error => console.error('Erro:', error));
-    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        consultaCliente();
+
+        const parametros = new URLSearchParams(window.location.search);
+        const id = parametros.get('id');
+        if(id != null && id != ''){
+            editarAnimal(id);
+        }
+                                 
+        document.getElementById('idAnimal').value = id;
+        
+      
+        const tipoUsuario = sessionStorage.getItem('tipoUsuario');
+        alert(tipoUsuario);
+        if (tipoUsuario == 'admin') {
+          document.getElementById('telaUsuario').style.display = 'inline-block';;
+          document.getElementById('telaAgenda').style.display = 'inline-block';;
+          document.getElementById('telaAnimal').style.display = 'inline-block';;
+          document.getElementById('telaCliente').style.display = 'inline-block';;
+        } else if (tipoUsuario == 'cliente') {
+          document.getElementById('telaUsuario').style.display = 'none';
+          document.getElementById('telaAgenda').style.display = 'none';
+          document.getElementById('telaAnimal').style.display = 'none';
+          document.getElementById('telaCliente').style.display = 'none';        
+        } else {
+          document.getElementById('telaUsuario').style.display = 'none';
+          document.getElementById('telaAgenda').style.display = 'inline-block';;
+          document.getElementById('telaAnimal').style.display = 'inline-block';;
+          document.getElementById('telaCliente').style.display = 'inline-block';;
+        }
+      });
+
+      function sair() {
+        sessionStorage.clear();
+        window.location.href = '/petshop.html';
+    }
+
 </script>
 
 
@@ -47,15 +148,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro Clientes</title>
+    <link rel="icon" href="paw.png" type="image/x-icon">
+    <title>Cadastro Animais</title>
     <link rel="stylesheet" href="cadastroanimal.css">
 </head>
 <body>
     <div class="navbar">
         <a href="funcionario.html">Home</a>
-        <a href="consultacliente.html">Cliente</a>
-        <a href="consultaanimal.html">Animal</a>
-        <a href="agenda.html">Agenda</a>
+        <a id="telaCliente" href="consultacliente.html">Cliente</a>
+        <a id="telaAnimal" href="consultaanimal.html">Animal</a>
+        <a id="telaAgenda" href="agenda.html">Agenda</a>
+        <a id="telaUsuario" href="consultausuario.html">Usuário</a>
+        <a onclick="sair()">Sair</a>
     </div>
 
     <h1>ANIMAIS</h1>
@@ -63,12 +167,26 @@
     <div class="container">
         <div class="form-box">
             <h2>Cadastro de Animal</h2>
-            <form>
-                <label for="nome">Nome:</label>
-                <input type="text" id="nome" name="nome">
+            <form onsubmit="salvarAnimal()">
+                <label for="cliente">Cliente*:</label>
+                <select id="cbcliente" name="cbcliente" required 
+                oninvalid="this.setCustomValidity('Por favor, preencha este campo o cliente.')"
+                oninput="setCustomValidity('')">
+                    <option value="" selected>Selecione uma opção</option>
+            
+                </select>
+                <br/><br/>
 
-                <label for="tipo">Tipo:</label>
-                <select id="tipo" name="tipo">
+                <input type="hidden" id="idAnimal" >
+                <label for="nome">Nome*:</label>
+                <input type="text" id="nome" name="nome" required maxlength="300"
+                oninvalid="this.setCustomValidity('Por favor, preencha este campo com o nome do animal.')"
+                oninput="setCustomValidity('')">
+
+                <label for="tipo">Tipo*:</label>
+                <select id="tipo" name="tipo" required maxlength="200"
+                oninvalid="this.setCustomValidity('Por favor, preencha este campo com o tipo do animal.')"
+                oninput="setCustomValidity('')">>
                     <option value="" selected>Selecione uma opção</option>
                     <option value="Cachorro">Cachorro</option>
                     <option value="Gato">Gato</option>
@@ -76,16 +194,20 @@
                     <option value="Outros">Outros</option>
                 </select>
 
-                <label for="porte">Porte:</label>
-                <select id="porte" name="porte">
+                <label for="porte">Porte*:</label>
+                <select id="porte" name="porte" required 
+                oninvalid="this.setCustomValidity('Por favor, preencha este campo com o porte do animal.')"
+                oninput="setCustomValidity('')">>
                     <option value="" selected>Selecione uma opção</option>
                     <option value="Pequeno">Pequeno</option>
                     <option value="Grande">Grande</option>
                     <option value="Medio">Médio</option>
                 </select>
 <br/><br/>
-                    <label for="sexo">Sexo:</label>
-                    <select id="sexo" name="sexo">
+                    <label for="sexo">Sexo*:</label>
+                    <select id="sexo" name="sexo" required
+                    oninvalid="this.setCustomValidity('Por favor, preencha este campo com o sexo do animal.')"
+                    oninput="setCustomValidity('')">>
                         <option value="" selected>Selecione uma opção</option>
                         <option value="Macho">Macho</option>
                         <option value="Femea">Fêmea</option>
@@ -93,13 +215,13 @@
 <br/><br/>                    
 
                 <label for="cor">Cor:</label>
-                <input type="text" id="cor" name="cor">
+                <input type="text" id="cor" name="cor" maxlength="80">
 
                 <label for="obs">Observações gerais:</label>
-                <textarea id="obs" name="obs"></textarea>
+                <textarea id="obs" name="obs" maxlength="500"></textarea>
                 <br/>
 
-                <button onclick="salvarAnimal()">Salvar</button><button type="reset" onclick="window.location.href='consultaanimal.html'">Cancelar</button>
+                <button type="submit">Salvar</button><button type="reset" onclick="window.location.href='consultaanimal.html'">Cancelar</button>
                 
             </form>
         </div>

@@ -2,38 +2,79 @@
 <html lang="pt">
 
 <script>
-    function excluirAgenda(id) {
-        
+
+    let idAgendaSelExclusao = null;
+    let idAgendaSelConclusao = null;
+    let paginaAtual = 0;
+    let registrosPorPagina = 3;
+    let totalRegistrosConsulta = 0;
+    const tipoUsuario = sessionStorage.getItem('tipoUsuario');
+    let idCliente = sessionStorage.getItem('idCliente');
+  
+
+    function excluirAgenda(acao) {
+
+      document.getElementById('overlay').style.display = 'none'; // Fechar o diálogo
+      
+      if (acao === 'sim') {
         fetch('/api/excluiragenda', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id })
+            body: JSON.stringify({ id:idAgendaSelExclusao })
         }).then(response => response.json()).then(data => {
+            idAgendaSelExclusao = null;
+            
+            alert("Agendamento excluído com sucesso!");
             window.location.reload(); // Recarrega a página
-                alert('agendamento excluído com sucesso!');        
-        }).catch(error => console.error('Erro:', error));
+
+        }).catch(error =>alert("Erro ao excluir o agendamento!"));
+      } else {
+        idAgendaSelExclusao = null;
+      }
     }
+
+    function concluirAgenda(acao) {
+      
+      document.getElementById('overlay2').style.display = 'none'; // Fechar o diálogo
+      
+      if (acao === 'sim') {
+        
+        fetch('/api/concluiragenda', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id:idAgendaSelConclusao })
+        }).then(data => {
+            idAgendaSelConclusao = null;
+            
+            alert("Agendamento concluído com sucesso!");
+            window.location.reload(); // Recarrega a página
+
+      }).catch(error =>alert("Erro ao concluir o agendamento!"));
+      } else {
+        idAgendaSelConclusao = null;
+      }
+    }
+      
+
     function consultaAgenda() {
-    
+     
         fetch('/api/consultaagenda', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({  })
+            body: JSON.stringify({ paginaAtual, registrosPorPagina, idCliente })
         })
             .then(response => response.json()).then(data => {
                 console.log(data[0]);
 
                 data[0].forEach(agendar => {
 
-                 // console.log(agendar.id)
-                 // console.log(agendar.idAnimal)
-                  console.log(agendar.dataAgenda)
-                  console.log(agendar.horarioInicio)
-                  console.log(agendar.horarioFim)
-                 // console.log(agendar.idServicos)
-                  
-                  
-
+                 /*console.log(agendar.id)
+                 console.log(agendar.nomeAnimal)
+                 console.log(agendar.dataAgenda)
+                 console.log(agendar.horarioInicio)
+                 console.log(agendar.horarioFim)
+                 console.log(agendar.idServicos)*/
+                                  
                   const tabelaAgendar = document.getElementById('tabelaAgendar').getElementsByTagName('tbody')[0];
 
                   const row = tabelaAgendar.insertRow();  // Cria uma nova linha
@@ -44,59 +85,257 @@
                   const cellDataAgenda = row.insertCell(2);
                   const cellHorarioInicio = row.insertCell(3);
                   const cellHorarioFim = row.insertCell(4);
-                  const cellStatus = row.insertCell(5);
-                  const cellAcao = row.insertCell(6);
+                  const cellServicos = row.insertCell(5);
+                  const cellStatus = row.insertCell(6);
+                  const cellAcao = row.insertCell(7);
 
                   
                   // Preenche as células com os dados retornados
-                  cellCliente.textContent = "";
-                  cellAnimal.textContent = "";
+                  cellCliente.textContent = agendar.nomeCliente;
+                  cellAnimal.textContent = agendar.nomeAnimal;
                   cellDataAgenda.textContent = agendar.dataAgenda;
                   cellHorarioInicio.textContent = agendar.horarioInicio;
                   cellHorarioFim.textContent = agendar.horarioFim;
-                  cellStatus.textContent = "";
-                 
-                  const btnEditar = document.createElement('button');
-                  btnEditar.textContent = 'Editar';
-                  btnEditar.className = 'btn-editar';
-              
-                  // Botão de excluir
-                  const btnExcluir = document.createElement('button');
-                  btnExcluir.textContent = 'Excluir';
-                  btnExcluir.className = 'btn-excluir';
-                  btnExcluir.addEventListener('click', () => {
-                    excluirAgenda(agendar.id); // Chama a função com o nome do cliente
-                });
-              
-                  // Adiciona os botões à célula de ação
-                  cellAcao.appendChild(btnEditar);
-                  cellAcao.appendChild(btnExcluir);
-          
-                  });
-            })
+
+                  if(agendar.idServico===1){
+                    cellServicos.textContent = 'Banho';
+                  } else if(agendar.idServico===2){
+                    cellServicos.textContent = 'Tosa';
+                  } else if(agendar.idServico===3){
+                    cellServicos.textContent = 'Banho e Tosa';
+                  } else if(agendar.idServico===4){
+                        cellServicos.textContent = 'Vacinação';  
+                  } else {
+                    cellServicos.textContent = 'Consulta';
+                  }
+
+                  if(agendar.status==='Aguardando_execucao'){
+                    cellStatus.textContent = 'Aguardando Execução';
+                  } else if (agendar.status==='Em_andamento'){
+                    cellStatus.textContent = 'Em Andamento';
+                  } else {
+                    cellStatus.textContent = 'Concluído';
+                  }          
+
+                    if (tipoUsuario !== 'cliente') {
+                      // Crie os botões somente se o usuário NÃO for cliente
+                      const btnEditar = document.createElement('button');
+                      btnEditar.className = 'btn-editar';
+                      btnEditar.addEventListener('click', () => {
+                          editarAgenda(agendar.id);
+                      });
+                  
+                      const imgEditar = document.createElement('img');
+                      imgEditar.src = 'pencil.png';
+                      imgEditar.style.width = '20px';
+                      imgEditar.style.height = '20px';
+                  
+                      const btnExcluir = document.createElement('button');
+                      btnExcluir.className = 'btn-excluir';
+                      btnExcluir.addEventListener('click', () => {
+                          idAgendaSelExclusao = agendar.id;
+                          mostrarAlertaExclusao();
+                      });
+                  
+                      const imgExcluir = document.createElement('img');
+                      imgExcluir.src = 'trash.png';
+                      imgExcluir.style.width = '20px';
+                      imgExcluir.style.height = '20px';
+                  
+                      const btnConcluir = document.createElement('button');
+                      btnConcluir.className = 'btn-concluir';
+                      btnConcluir.addEventListener('click', () => {
+                          idAgendaSelConclusao = agendar.id;
+                          mostrarAlertaConclusao();
+                      });
+                  
+                      const imgConcluir = document.createElement('img');
+                      imgConcluir.src = 'checkbox.png';
+                      imgConcluir.style.width = '20px';
+                      imgConcluir.style.height = '20px';
+                  
+                      btnEditar.appendChild(imgEditar);
+                      btnExcluir.appendChild(imgExcluir);
+                      btnConcluir.appendChild(imgConcluir);
+                  
+                      // Adicione os botões ao cellAcao
+                      cellAcao.appendChild(btnEditar);
+                      cellAcao.appendChild(btnExcluir);
+                      cellAcao.appendChild(btnConcluir);
+                  } else {
+                      // Oculte a coluna de ações se o usuário for cliente
+                      cellAcao.style.display = 'none';
+                  }
+                });                  
+          })
             .catch(error => console.error('Erro:', error));
     }
+
+    function mostrarAlertaExclusao() {
+      document.getElementById('overlay').style.display = 'flex';
+    }
+
+    function editarAgenda(id) {
+        window.location.href = `agenda.html?id=${id}`;
+    }
+
+    function mostrarAlertaConclusao() {
+      document.getElementById('overlay2').style.display = 'flex';
+    }
+
+    function limparConteudo() {
+      var tabela = document.getElementById("tabelaAgendar").getElementsByTagName('tbody')[0];
+      
+      while (tabela.rows.length > 0) {
+        tabela.deleteRow(0);
+    }
+  }
+
+    function primeiraPagina() {
+      pesquisarTotalRegistros();
+      limparConteudo()
+      paginaAtual = 0;
+      consultaAgenda();
+
+    }
+    async function proximaPagina() {
+      await pesquisarTotalRegistros();
+      paginaAtual = paginaAtual + registrosPorPagina;
+
+      if(parseInt(paginaAtual) == parseInt(totalRegistrosConsulta)){
+          /* Se entrou nesta condição é porque a pagina atual é a ultima, sendo assim a variavel paginaAtual não deve ser incrementada, devido a isso é executado a subtração para a variavel voltar ao seu valor anterior */
+          paginaAtual = paginaAtual - registrosPorPagina;
+      } else if (paginaAtual > totalRegistrosConsulta) {
+          /* Se entrou nesta condição, é porque a quantidade de registros da proxima página é menor que a quantidade total de registros listados em cada página */
+          limparConteudo();
+          let paginaComConteudoParcial = totalRegistrosConsulta / registrosPorPagina;
+          if (paginaComConteudoParcial > 0) {
+              let parteInteira = Math.floor(paginaComConteudoParcial); 
+              paginaAtual = parteInteira * registrosPorPagina;      
+              consultaCliente();
+          }
+      } else if ( parseInt(paginaAtual) < parseInt(totalRegistrosConsulta)) {
+          /*Se entrou nesta condição, é porque a página atual é menor que o total de registros, ou seja, irá continuar a paginação sequencial */
+        limparConteudo();          
+        consultaAgenda(); 
+      }
+    }
+
+    async function ultimaPagina() {
+      
+        await pesquisarTotalRegistros();
+        
+        if(parseInt(paginaAtual) != parseInt(totalRegistrosConsulta)){
+
+            let paginaComConteudoParcial = totalRegistrosConsulta / registrosPorPagina;
+            if (paginaComConteudoParcial > 0) {
+
+                if(paginaComConteudoParcial % 1 == 0){                   
+                    /*Se entrou nesta condição é porque o numero total de registros divido pela quantidade de registros por página corresponte a um numero inteiro, ou seja, se a paginação for de 10 em 10, significa que a ultima pagina possui 10 registros*/
+                    let parteInteira = Math.floor(paginaComConteudoParcial); 
+                    paginaAtual = parteInteira * registrosPorPagina;
+                    paginaAtual = totalRegistrosConsulta - registrosPorPagina;
+                } else {
+                    /*Se entrou nesta condição é porque o numero total de registros divido pela quantidade de registros por página corresponte a um numero decimal, ou seja, se a paginação for de 10 em 10, significa que a ultima pagina menos de 10 registros e devido a isso é necessário calcular o valor paginaAtual*/
+                    let parteInteira = Math.floor(paginaComConteudoParcial); 
+                    paginaAtual = parteInteira * registrosPorPagina;
+                }                                 
+          
+        limparConteudo();
+        consultaAgenda();
+      }
+    }
+  }
+
+    function paginaAnterior() {
+       paginaAtual = paginaAtual - registrosPorPagina;
+        if (paginaAtual < 0) {
+          paginaAtual = 0;
+        } else if (paginaAtual >= 0) {
+      limparConteudo()
+      consultaAgenda();
+    }
+  } 
+
+    function pesquisarTotalRegistros() {
+      fetch('/api/pesquisartotalregistrosagenda', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idCliente })
+      }).then(response => response.json()).then(data => {
+        totalRegistrosConsulta = data[0][0].total;
+      }).catch(error => console.error('Erro:', error));
+    }
+    
     
     document.addEventListener('DOMContentLoaded', function () {
-        consultaAgenda();
-      });
+        const tipoUsuario = sessionStorage.getItem('tipoUsuario');
+        idCliente = sessionStorage.getItem('idCliente');        
+        primeiraPagina();
+          
+        //alert(tipoUsuario);
+        if (tipoUsuario == 'admin') {
+          document.getElementById('telaUsuario').style.display = 'inline-block';;
+          document.getElementById('telaAgenda').style.display = 'inline-block';;
+          document.getElementById('telaAnimal').style.display = 'inline-block';;
+          document.getElementById('telaCliente').style.display = 'inline-block';;
+        } else if (tipoUsuario == 'cliente') {
+          document.getElementById('telaUsuario').style.display = 'none';
+          document.getElementById('telaAgenda').style.display = 'none';
+          document.getElementById('telaAnimal').style.display = 'none';
+          document.getElementById('telaCliente').style.display = 'none'; 
+          document.getElementById('colunaAcao').style.display = 'none';   
+          document.getElementById('btnAdicionarAgendamento').style.display = 'none';  
+          //document.getElementById('paginacao').style.display = 'none';  
+        } else {
+          document.getElementById('telaUsuario').style.display = 'none';
+          document.getElementById('telaAgenda').style.display = 'inline-block';;
+          document.getElementById('telaAnimal').style.display = 'inline-block';;
+          document.getElementById('telaCliente').style.display = 'inline-block';;
+        }
+    });
+
+      function sair() {
+        sessionStorage.clear();
+        window.location.href = '/petshop.html';
+    }
+
 </script>
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agendamentos</title>
+    <link rel="icon" href="paw.png" type="image/x-icon">
+    <title>Agenda</title>
     <link rel="stylesheet" href="funcionario.css">
 </head>
 <body>
     <div class="navbar">
         <a href="funcionario.html">Home</a>
-        <a href="consultacliente.html">Cliente</a>
-        <a href="consultaanimal.html">Animal</a>
-        <a href="agenda.html">Agenda</a>
+        <a id="telaCliente" href="consultacliente.html">Cliente</a>
+        <a id="telaAnimal" href="consultaanimal.html">Animal</a>
+        <a id="telaAgenda" href="agenda.html">Agenda</a>
+        <a id="telaUsuario" href="consultausuario.html">Usuário</a>
+        <a onclick="sair()">Sair</a>
     </div>
 
     <h1>AGENDAMENTOS</h1>
+    <div class="overlay" id="overlay">
+      <div class="dialog-box">
+          <p>Você tem certeza que deseja excluir esse agendamento?</p>
+          <button id="sim" onclick="excluirAgenda('sim')">Sim</button>
+          <button id="nao" onclick="excluirAgenda('nao')">Não</button>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlay2">
+      <div class="dialog-box">
+          <p>Você tem certeza que deseja concluir esse agendamento?</p>
+          <button id="sim" onclick="concluirAgenda('sim')">Sim</button>
+          <button id="nao" onclick="concluirAgenda('nao')">Não</button>
+      </div>
+    </div>
+        
 
     <table id="tabelaAgendar">
         <thead>
@@ -106,8 +345,9 @@
                 <th>Data</th>
                 <th>HI</th>
                 <th>HP</th>
+                <th>Serviços</th>
                 <th>Status</th>
-                <th>Ações</th>
+                <th id="colunaAcao">Ações</th>
             </tr>
         </thead> 
         <tbody>
@@ -116,5 +356,31 @@
             </tr>
         </tbody>    
     </table>
+
+
+    <div class="container">
+
+      <div id="paginacao"  class="paginacao">
+          <p class="descricao">Paginação</p>
+          <button class="botao-imagem" onclick="primeiraPagina()">
+              <img src="2flechaesquerda.png" alt="Imagem 1">
+          </button>
+          <button class="botao-imagem" onclick="paginaAnterior()">
+              <img src="flechaesquerda.png" alt="Imagem 2">
+          </button>
+          <button class="botao-imagem" onclick="proximaPagina()">
+              <img src="flechadireita.png" alt="Imagem 3">
+          </button>
+          <button class="botao-imagem" onclick="ultimaPagina()">
+              <img src="2flechadireita.png" alt="Imagem 4">
+          </button>
+      </div>
+  
+      <div class="adicionar">
+          <button  id="btnAdicionarAgendamento"  class="botao" type="submit" onclick="window.location.href='agenda.html'">Adicionar Agendamento</button>
+      </div>
+  </div>
+  
+
 </body>
 </html>

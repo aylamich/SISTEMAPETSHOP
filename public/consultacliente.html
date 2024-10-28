@@ -2,33 +2,50 @@
 <html lang="pt">    
 
 <script>
-    function excluirCliente(id) {
-        
+    let idClienteSelExclusao = null;
+    let paginaAtual = 0;
+    let registrosPorPagina = 3;
+    let totalRegistrosConsulta = 0;
+
+    function excluirCliente(acao) {
+
+      document.getElementById('overlay').style.display = 'none'; // Fechar o diálogo
+      
+      if (acao === 'sim') {
         fetch('/api/excluircliente', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id })
-        }).then(response => response.json()).then(data => {
-            window.location.reload(); // Recarrega a página
-                alert('Cliente excluído com sucesso!');        
-        }).catch(error => console.error('Erro:', error));
+            body: JSON.stringify({ id:idClienteSelExclusao })
+        }).then(data => {
+            if (data.status == 400) {
+                alert('Não foi possível excluir o cliente, pois ele possui um animal com agendamento cadastrado!');
+            } else if (data.status == 200) {
+                idClienteSelExclusao = null;            
+                alert("Cliente excluído com sucesso!");
+                window.location.reload(); // Recarrega a página
+            }
+
+        }).catch(error =>alert("Erro ao excluir o cliente!"));
+      } else {
+        idClienteSelExclusao = null;
+      }
+    
     }
+
     function consultaCliente() {
     
         fetch('/api/consultacliente', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({  })
+            body: JSON.stringify({ paginaAtual, registrosPorPagina })
         })
-            .then(response => response.json()).then(data => {
+            .then(response => response.json())
+            .then(data => {
                 console.log(data);
 
                 data[0].forEach(cliente => {
-                   // const li = document.createElement('li');
-                  //  li.textContent = `${animal.nome} - ${animal.idade} anos`;
-                  //  listaAnimais.appendChild(li);
 
-                  console.log(cliente.id)
+                  /*console.log(cliente.id)
                   console.log(cliente.nomeCompleto)
                   console.log(cliente.contato)
                   console.log(cliente.email)
@@ -36,7 +53,7 @@
                   console.log(cliente.numero)
                   console.log(cliente.bairro)
                   console.log(cliente.cep)
-                  console.log(cliente.uf)
+                  console.log(cliente.uf)*/
 
                   const tabelaCliente = document.getElementById('tabelaCliente').getElementsByTagName('tbody')[0];
 
@@ -48,54 +65,199 @@
                   const cellEndereco = row.insertCell(2);
                   const cellAcao = row.insertCell(3);
 
-                  
-                  // Preenche as células com os dados retornados
+                
                   cellNome.textContent = cliente.nomeCompleto;
                   cellContato.textContent = cliente.contato;
-                  cellEndereco.textContent = cliente.rua + ' - ' + cliente.numero + ' - ' + cliente.bairro + ' - ' + cliente.cep + ' - ' + cliente.uf;
+                  cellEndereco.textContent = cliente.rua + ' - ' + cliente.numero + ' - ' + cliente.bairro + ' - ' + cliente.cep + ' - ' + cliente.uf + ' - ' + cliente.nomeCidade;
                  
                   const btnEditar = document.createElement('button');
-                  btnEditar.textContent = 'Editar';
                   btnEditar.className = 'btn-editar';
+                  btnEditar.addEventListener('click', () => {
+                    editarCliente(cliente.id); 
+                  });
+
+                  
+                  const imgEditar = document.createElement('img');
+                  imgEditar.src = 'pencil.png';
+                  imgEditar.style.width = '20px'; 
+                  imgEditar.style.height = '20px';
+
+                  btnEditar.appendChild(imgEditar);
               
-                  // Botão de excluir
                   const btnExcluir = document.createElement('button');
-                  btnExcluir.textContent = 'Excluir';
                   btnExcluir.className = 'btn-excluir';
                   btnExcluir.addEventListener('click', () => {
-                    excluirCliente(cliente.id); // Chama a função com o nome do cliente
+                    idClienteSelExclusao = cliente.id;
+                    mostrarAlertaExclusao(); // Chama a função com o nome do cliente
                 });
-              
-                  // Adiciona os botões à célula de ação
+
+                    const imgExcluir = document.createElement('img');
+                    imgExcluir.src = 'trash.png'; 
+                    imgExcluir.style.width = '20px'; 
+                    imgExcluir.style.height = '20px'; 
+
+                    btnExcluir.appendChild(imgExcluir);
+            
                   cellAcao.appendChild(btnEditar);
                   cellAcao.appendChild(btnExcluir);
           
                   });
-            })
-            .catch(error => console.error('Erro:', error));
+            }).catch(error => console.error('Erro:', error));
 
     }
+
+    function mostrarAlertaExclusao() {
+        document.getElementById('overlay').style.display = 'flex';
+    }
+
+    function editarCliente(id) {
+        window.location.href = `cadastrocliente.html?id=${id}`;
+    }
+
+    function limparConteudo() {
+        var tabela = document.getElementById("tabelaCliente").getElementsByTagName('tbody')[0];
+        
+        while (tabela.rows.length > 0) {
+          tabela.deleteRow(0);
+        }
+    }
+  
+    function primeiraPagina() {
+        pesquisarTotalRegistros();
+        limparConteudo()
+        paginaAtual = 0;
+        consultaCliente();  
+    }
+
+    async function proximaPagina() {
+        
+        await pesquisarTotalRegistros();
+        paginaAtual = paginaAtual + registrosPorPagina;
+
+        if(parseInt(paginaAtual) == parseInt(totalRegistrosConsulta)){
+            /* Se entrou nesta condição é porque a pagina atual é a ultima, sendo assim a variavel paginaAtual não deve ser incrementada, devido a isso é executado a subtração para a variavel voltar ao seu valor anterior */
+            paginaAtual = paginaAtual - registrosPorPagina;
+        } else if (paginaAtual > totalRegistrosConsulta) {
+            /* Se entrou nesta condição, é porque a quantidade de registros da proxima página é menor que a quantidade total de registros listados em cada página */
+            limparConteudo();
+            let paginaComConteudoParcial = totalRegistrosConsulta / registrosPorPagina;
+            if (paginaComConteudoParcial > 0) {
+                let parteInteira = Math.floor(paginaComConteudoParcial); 
+                paginaAtual = parteInteira * registrosPorPagina;      
+                consultaCliente();
+            }
+        } else if ( parseInt(paginaAtual) < parseInt(totalRegistrosConsulta)) {
+            /*Se entrou nesta condição, é porque a página atual é menor que o total de registros, ou seja, irá continuar a paginação sequencial */
+            limparConteudo();          
+            consultaCliente(); 
+        } 
+        
+      }
+
+      async function ultimaPagina() {
+
+        await pesquisarTotalRegistros();
+        
+        if(parseInt(paginaAtual) != parseInt(totalRegistrosConsulta)){
+
+            let paginaComConteudoParcial = totalRegistrosConsulta / registrosPorPagina;
+            if (paginaComConteudoParcial > 0) {
+
+                if(paginaComConteudoParcial % 1 == 0){                   
+                    /*Se entrou nesta condição é porque o numero total de registros divido pela quantidade de registros por página corresponte a um numero inteiro, ou seja, se a paginação for de 10 em 10, significa que a ultima pagina possui 10 registros*/
+                    let parteInteira = Math.floor(paginaComConteudoParcial); 
+                    paginaAtual = parteInteira * registrosPorPagina;
+                    paginaAtual = totalRegistrosConsulta - registrosPorPagina;
+                } else {
+                    /*Se entrou nesta condição é porque o numero total de registros divido pela quantidade de registros por página corresponte a um numero decimal, ou seja, se a paginação for de 10 em 10, significa que a ultima pagina menos de 10 registros e devido a isso é necessário calcular o valor paginaAtual*/
+                    let parteInteira = Math.floor(paginaComConteudoParcial); 
+                    paginaAtual = parteInteira * registrosPorPagina;
+                }                                 
+          
+                limparConteudo();
+                consultaCliente();
+            }
+
+        }        
+      }
+
+      function paginaAnterior() {
+        //pesquisarTotalRegistros();
+        paginaAtual = paginaAtual - registrosPorPagina;
+        if (paginaAtual < 0) {
+          paginaAtual = 0;
+        } else if (paginaAtual >= 0) {
+            limparConteudo()
+            consultaCliente();
+        }
+        
+      }
+  
+      function pesquisarTotalRegistros() {
+        fetch('/api/pesquisartotalregistroscliente', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        }).then(response => response.json()).then(data => {
+          totalRegistrosConsulta = data[0][0].total;
+        }).catch(error => console.error('Erro:', error));
+      }
     
-    document.addEventListener('DOMContentLoaded', function () {
-        consultaCliente();
+      document.addEventListener('DOMContentLoaded', function () {
+          primeiraPagina();
+          const tipoUsuario = sessionStorage.getItem('tipoUsuario');
+          //alert(tipoUsuario);
+          if (tipoUsuario == 'admin') {
+            document.getElementById('telaUsuario').style.display = 'inline-block';;
+            document.getElementById('telaAgenda').style.display = 'inline-block';;
+            document.getElementById('telaAnimal').style.display = 'inline-block';;
+            document.getElementById('telaCliente').style.display = 'inline-block';;
+          } else if (tipoUsuario == 'cliente') {
+            document.getElementById('telaUsuario').style.display = 'none';
+            document.getElementById('telaAgenda').style.display = 'none';
+            document.getElementById('telaAnimal').style.display = 'none';
+            document.getElementById('telaCliente').style.display = 'none';        
+          } else {
+            document.getElementById('telaUsuario').style.display = 'none';
+            document.getElementById('telaAgenda').style.display = 'inline-block';;
+            document.getElementById('telaAnimal').style.display = 'inline-block';;
+            document.getElementById('telaCliente').style.display = 'inline-block';;
+          }
       });
+
+      function sair() {
+        sessionStorage.clear();
+        window.location.href = '/petshop.html';
+      }   
+
 </script>
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro Clientes</title>
+    <link rel="icon" href="paw.png" type="image/x-icon">
+    <title>Consulta Clientes</title>
     <link rel="stylesheet" href="consultacliente.css">
 </head>
 <body>
     <div class="navbar">
         <a href="funcionario.html">Home</a>
-        <a href="consultacliente.html">Cliente</a>
-        <a href="consultaanimal.html">Animal</a>
-        <a href="agenda.html">Agenda</a>
+        <a id="telaCliente" href="consultacliente.html">Cliente</a>
+        <a id="telaAnimal" href="consultaanimal.html">Animal</a>
+        <a id="telaAgenda" href="agenda.html">Agenda</a>
+        <a id="telaUsuario" href="consultausuario.html">Usuário</a>
+        <a onclick="sair()">Sair</a>
     </div>
 
         <h2>CLIENTES</h2>
+
+        <div class="overlay" id="overlay">
+            <div class="dialog-box">
+                <p>Você tem certeza que deseja excluir esse cliente?</p>
+                <button id="sim" onclick="excluirCliente('sim')">Sim</button>
+                <button id="nao" onclick="excluirCliente('nao')">Não</button>
+            </div>
+          </div>
+
         <table align="center" id="tabelaCliente">
             <thead>
                 <tr>
@@ -109,8 +271,30 @@
                 
             </tbody>
         </table>
-        <div class="botao">
-          <button class="botao" type="submit" onclick="window.location.href='cadastrocliente.html'">Adicionar Cliente</button>
-       </div>
+
+        <div class="container2">
+
+            <div class="paginacao">
+                <p class="descricao">Paginação</p>
+                <button class="botao-imagem" onclick="primeiraPagina()">
+                    <img src="2flechaesquerda.png" alt="Imagem 1">
+                </button>
+                <button class="botao-imagem" onclick="paginaAnterior()">
+                    <img src="flechaesquerda.png" alt="Imagem 2">
+                </button>
+                <button class="botao-imagem" onclick="proximaPagina()" type="button" >
+                    <img src="flechadireita.png" alt="Imagem 3">
+                </button>
+                <button class="botao-imagem" onclick="ultimaPagina()">
+                    <img src="2flechadireita.png" alt="Imagem 4">
+                </button>
+            </div>
+        
+            <div class="adicionar">
+                <button class="botao" type="submit" onclick="window.location.href='cadastrocliente.html'">Adicionar Cliente</button>
+            </div>
+        </div>
+
+
 </body>
 </html>

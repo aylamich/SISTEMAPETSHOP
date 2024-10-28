@@ -2,85 +2,274 @@
 <html lang="pt">
 
 <script>
+    function consultaCliente() {
+   
+        fetch('/api/consultacliente', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({  })
+        })
+            .then(response => response.json()).then(data => {
+                //console.log(data);
+
+                const comboBoxCliente = document.getElementById('cbcliente');
+            
+
+                data[0].forEach(cliente => {
+                 /* console.log(cliente.id)
+                  console.log(cliente.nomeCompleto)
+                  console.log(cliente.contato)
+                  console.log(cliente.email)
+                  console.log(cliente.rua)
+                  console.log(cliente.numero)
+                  console.log(cliente.bairro)
+                  console.log(cliente.cep)
+                  console.log(cliente.uf)  */
+
+                  const option = document.createElement('option');
+                  option.value = cliente.id;
+                  option.text =  cliente.nomeCompleto;  //cliente.nomeCompleto;
+                  comboBoxCliente.appendChild(option);  
+
+                  });
+            })
+            .catch(error => console.error('Erro:', error));
+
+    }
+    
+   function consultaAnimal() {
+    
+        fetch('/api/consultaanimal', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({  })
+        })
+            .then(response => response.json()).then(data => {
+                console.log(data[0]);
+
+
+                const comboBoxAnimal = document.getElementById('cbanimal');
+
+                data[0].forEach(animal => {;
+
+                  console.log(animal.id)
+                  console.log(animal.nome)
+                  console.log(animal.tipo)
+                  console.log(animal.porte)
+                  console.log(animal.sexo)
+                  console.log(animal.observacoes)
+                  
+                  const option = document.createElement('option');
+                  option.value = animal.id;
+                  option.text =  animal.nomeAnimal;  
+                  comboBoxAnimal.appendChild(option);  
+
+                  });
+
+            }).catch(error => console.error('Erro:', error));
+        }
+
     function salvarAgenda() {
             
             // Obter os valores dos campos
-            const cliente = document.getElementById('cliente').value;
-            const data = document.getElementById('data').value;
-            const animal = document.getElementById('animal').value;
+            const idAgenda = document.getElementById('idAgenda').value; // <input type="hidden" id="idAgenda" >
+            const idCliente = document.getElementById('cbcliente').value;                      
+            const data = document.getElementById('data').value; 
             const timeInput1 = document.getElementById('time-input1').value;
-            const timeInput2 = document.getElementById('time-input2').value;
-            const obs = document.getElementById('obs').value;
+            const timeInput2 = document.getElementById('time-input2').value;                      
+            const idAnimal = document.getElementById('cbanimal').value;            
+            const status = document.getElementById('cbstatus').value;            
+            const idServico = document.getElementById('cbsv').value;
+            
+            if(idAgenda != null && idAgenda != ''){
+                fetch('/api/alteraragenda', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idAgenda, idAnimal, data, timeInput1, timeInput2, idServico, status, idCliente })
+                                           
+                }).then(data => {
+                        window.location.href = '/funcionario.html';
+                    }).catch(error => console.error('Erro:', error));
+                return;
     
-            // Enviar os dados para a API
-            fetch('/api/agenda', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cliente, data, animal, timeInput1, timeInput2, obs })
-            })
-                .then(response => response.json())
-                .then(data => {
-                // Redirecionar para a página de consulta
-                window.location.href = '/funcionario.html';
-                })
-                .catch(error => console.error('Erro:', error));
+            } else {
+                
+                fetch('/api/agenda', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({idAnimal, data, timeInput1, timeInput2, idServico, status, idCliente })                            
+                }).then(data => {
+                    alert('Agendamento cadastrado com sucesso!')
+                    window.location.href = 'funcionario.html';
+                    }).catch(error => console.error('Erro:', error));
+            }
+    
     }
+
+    function editarAgenda(id) {
+        fetch('/api/editaragenda', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id })
+        })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('cbcliente').value = data[0][0].idCliente;
+                document.getElementById('cbanimal').value = data[0][0].idAnimal;
+                document.getElementById('data').value = data[0][0].dataAgenda;
+                document.getElementById('time-input1').value = data[0][0].horarioInicio;
+                document.getElementById('time-input2').value = data[0][0].horarioFim;
+                document.getElementById('cbsv').value = data[0][0].idServico;
+                document.getElementById('cbstatus').value = data[0][0].status;
+
+            }).catch(error => console.error('Erro:', error));
+    }
+
+    function consultaAnimalPorDono () {
+        const clienteSelecionado = document.getElementById('cbcliente').value;
+        
+        fetch('/api/consultaanimalpordono', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clienteSelecionado })
+        }).then(response => response.json()).then(data => {
+
+            const comboBoxAnimal = document.getElementById('cbanimal');
+            comboBoxAnimal.innerHTML = '';
+            data[0].forEach(animal => {
+              
+              const option = document.createElement('option');
+              option.value = animal.id;
+              option.text =  animal.nome; 
+              comboBoxAnimal.appendChild(option);  
+              });
+        }).catch(error => console.error('Erro:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        consultaAnimal();
+        consultaCliente();
+
+        const parametros = new URLSearchParams(window.location.search);
+        const id = parametros.get('id');
+        if(id != null && id != ''){
+            editarAgenda(id);
+        }
+                                 
+        document.getElementById('idAgenda').value = id;
+        
+        const tipoUsuario = sessionStorage.getItem('tipoUsuario');
+        //alert(tipoUsuario);
+        if (tipoUsuario == 'admin') {
+          document.getElementById('telaUsuario').style.display = 'inline-block';;
+          document.getElementById('telaAgenda').style.display = 'inline-block';;
+          document.getElementById('telaAnimal').style.display = 'inline-block';;
+          document.getElementById('telaCliente').style.display = 'inline-block';;
+        } else if (tipoUsuario == 'cliente') {
+          document.getElementById('telaUsuario').style.display = 'none';
+          document.getElementById('telaAgenda').style.display = 'none';
+          document.getElementById('telaAnimal').style.display = 'none';
+          document.getElementById('telaCliente').style.display = 'none';        
+        } else {
+          document.getElementById('telaUsuario').style.display = 'none';
+          document.getElementById('telaAgenda').style.display = 'inline-block';;
+          document.getElementById('telaAnimal').style.display = 'inline-block';;
+          document.getElementById('telaCliente').style.display = 'inline-block';;
+        }
+      });
+
+      function sair() {
+        sessionStorage.clear();
+        window.location.href = '/petshop.html';
+    }
+
 </script>
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro Clientes</title>
+    <link rel="icon" href="paw.png" type="image/x-icon">
+    <title>Agendamento</title>
     <link rel="stylesheet" href="agenda.css">
 </head>
 <body>
     <div class="navbar">
         <a href="funcionario.html">Home</a>
-        <a href="consultacliente.html">Cliente</a>
-        <a href="consultaanimal.html">Animal</a>
-        <a href="agenda.html">Agenda</a>
+        <a id="telaCliente" href="consultacliente.html">Cliente</a>
+        <a id="telaAnimal" href="consultaanimal.html">Animal</a>
+        <a id="telaAgenda" href="agenda.html">Agenda</a>
+        <a id="telaUsuario" href="consultausuario.html">Usuário</a>
+        <a onclick="sair()">Sair</a>
     </div>
 
     <h1>AGENDAMENTO</h1>
 
     <div class="container">
         <div class="form-box">
-            <form>
-                <label for="cliente">Cliente:</label> 
-                <div id="cliente" class="input-container">
-                    <input type="text">
-                    <button class="procurar">
-                        <img src="search.png" alt="Buscar" width="17px">
-                    </button>
-                </div>
+            <form onsubmit="salvarAgenda()">
+                <input type="hidden" id="idAgenda" >
+                
+                <label for="cliente">Cliente*:</label>
+                <select id="cbcliente" name="cbcliente" required
+                oninvalid="this.setCustomValidity('Por favor, preencha este campo com o cliente.')"
+                oninput="setCustomValidity('')"
+                onchange="consultaAnimalPorDono()">
+                    <option value="" selected>Selecione um cliente</option>
+                    
+                </select>
+<br/><br/> 
 
-                <label for="data">Escolhe uma data:</label>
-                <input type="date" id="data" name="data"> 
+                <label for="data">Escolhe uma data*:</label>
+                <input type="date" id="data" name="data" required
+                oninvalid="this.setCustomValidity('Por favor, preencha este campo com a data do agendamento.')"
+                oninput="setCustomValidity('')">
 <br/><br/>                
                    
 
-                <label for="animal">Animal:</label>
-                <select id="animal" name="animal">
+                <label for="animal">Animal*:</label>
+                <select id="cbanimal" name="cbanimal"  required
+                oninvalid="this.setCustomValidity('Por favor, preencha este campo com o animal.')"
+                oninput="setCustomValidity('')">
                     <option value="" selected>Selecione um animal</option>
-                    <option value="Toto">Toto</option>
-                    <option value="Nonis">Nonis</option>
-                    <option value="Lolo">Lolo</option>
+                    
                 </select>
 <br/><br/>                   
 
-                <label for="time-input">Horário entrado:</label>
-                <input type="time" id="time-input1" class="time-input">
+                <label for="time-input">Horário entrado*:</label>
+                <input type="time" id="time-input1" class="time-input" required
+                oninvalid="this.setCustomValidity('Por favor, preencha este campo com o horário entrado.')"
+                oninput="setCustomValidity('')">
 <br/><br/>   
 
-                <label for="time-input">Horário previsto término:</label>
-                <input type="time" id="time-input2" class="time-input">
+                <label for="time-input">Horário previsto término*:</label>
+                <input type="time" id="time-input2" class="time-input" required 
+                oninvalid="this.setCustomValidity('Por favor, preencha este campo com o horário previsto término.')"
+                oninput="setCustomValidity('')">
 <br/><br/>   
-
-                <label for="obs">Serviços:</label>
-                <textarea id="obs" name="obs"></textarea>
+                <label for="servicos">Serviços*:</label>
+                <select id="cbsv" name="cbsv" required 
+                oninvalid="this.setCustomValidity('Por favor, preencha este campo com o serviço desejado.')"
+                oninput="setCustomValidity('')">
+                    <option value="" selected>Selecione um serviço</option>
+                    <option value="1">Banho</option>
+                    <option value="2">Tosa</option>
+                    <option value="3">Banho + Tosa</option>
+                    <option value="4">Vacinação</option>
+                    <option value="5">Consulta</option>
+                </select>
+               
+                
+<br/><br/>
+               
+                <label for="status">Status:</label>
+                <select id="cbstatus" name="cbstatus">
+                    <option value="Aguardando_execucao" selected>Aguardando execução</option>
+                    <option value="Em_andamento">Em andamento</option>
+                    <option value="Concluido">Concluído</option>
+                </select>
                 <br/>
 
-                <button onclick="salvarAgenda()">Salvar</button><button type="reset" onclick="window.location.href='funcionario.html'">Cancelar</button>
+                <button type="submit">Salvar</button><button type="reset" onclick="window.location.href='funcionario.html'">Cancelar</button>
                 
             </form>
         </div>

@@ -64,13 +64,103 @@ tr:hover {
     display: center;
     gap: 10px;
 }
-.btn-editar, .btn-excluir, .btn-atualizar{
+.btn-editar, .btn-excluir, .btn-concluir{
     padding: 5px;
     cursor: pointer;
     border: none;
     background: none;
 }
-.btn-editar img, .btn-excluir img, .btn-atualizar img {
+.btn-editar img, .btn-excluir img, .btn-concluir img {
     width: 20px;
     height: 20px;
+}
+
+
+.container {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    width: 100%; 
+    padding: 10px;
+}
+
+.paginacao {
+    display: flex;
+    align-items: left;
+    gap: 1px; 
+    margin-left: 150px;
+}
+
+.adicionar {
+    display: flex;
+    align-items: center;
+}
+
+
+.botao {
+    margin-right: 150px;
+    padding: 10px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+.botao-imagem {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    
+}
+
+.botao-imagem img {
+    width: 20px;
+    height: 20px
+
+}
+
+.descricao {
+    margin-right: 10px; 
+}
+
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Estilos da caixa de diálogo */
+.dialog-box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Botões */
+.dialog-box button {
+    margin: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.dialog-box button#sim {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.dialog-box button#nao {
+    background-color: #f44336;
+    color: white;
 }
