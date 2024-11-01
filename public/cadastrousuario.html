@@ -43,14 +43,14 @@
         const username = document.getElementById('username').value;
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
-        const perfil = document.querySelector('input[name="perfil"]:checked').value;
+        const tipoUsuario = document.querySelector('input[name="perfil"]:checked').value;
 
         if(idUsuario != null && idUsuario != ''){
            // alert('nome: ' + username + ' email: ' + email + ' senha: ' + password + ' perfil: ' + perfil);
             fetch('/api/alterarusuario', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ idUsuario, idCliente, username, email, password, perfil })
+                body: JSON.stringify({ idUsuario, idCliente, username, email, password, tipoUsuario })
                                        
             }).then(data => {
                     window.location.href = '/consultausuario.html';
@@ -62,7 +62,7 @@
             fetch('/api/cadastrousuario', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ idCliente, username, email, password, perfil })                            
+                body: JSON.stringify({ idCliente, username, email, password, tipoUsuario })                            
             }).then(data => {                    
                 alert('Usuário cadastrado com sucesso!')
                 window.location.href = 'consultausuario.html';
@@ -84,7 +84,13 @@
                 document.getElementById('username').value = data[0][0].nomeCompleto;
                 document.getElementById('email').value = data[0][0].email;
                 document.getElementById('password').value = data[0][0].senha;
-                document.getElementById('perfil').value = data[0][0].tipoUsuario;
+                const tipoUsuario = data[0][0].tipoUsuario;
+                console.log("Perfil:", tipoUsuario);
+                const radio = document.querySelector(`input[name="perfil"][value="${tipoUsuario}"]`);
+                if (radio) {
+                    radio.checked = true;
+                }
+                //document.getElementById('perfil').value = data[0][0].tipoUsuario;
                 document.getElementById('idUsuario').value = data[0][0].id;
             }).catch(error => console.error('Erro:', error));
     }
@@ -132,11 +138,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="paw.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=DynaPuff:wght@400..700&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Moderustic:wght@300..800&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Tiny5&display=swap" rel="stylesheet">
     <title>Cadastro Usuários</title>
     <link rel="stylesheet" href="cadastrousuario.css">
 </head>
 <body>
-    <div class="navbar">
+    <div class="header">
+        <div class="logo">
+          <h1>PETTOPIA</h1>
+          <img src="petshop.png">
+        </div>
+      <div class="navbar-container">  
+        <div class="navbar">
         <a href="funcionario.html">Home</a>
         <a id="telaCliente" href="consultacliente.html">Cliente</a>
         <a id="telaAnimal" href="consultaanimal.html">Animal</a>
@@ -144,6 +157,8 @@
         <a id="telaUsuario" href="consultausuario.html">Usuário</a>
         <a onclick="sair()">Sair</a>
     </div>
+  </div>
+</div>
 
     <h1>USUÁRIOS</h1>
 
@@ -183,7 +198,7 @@
                     <label for="cliente">Cliente</label>
                 </div>
                 <div>
-                    <input type="radio" id="funcionario" name="perfil" value="funcionario">
+                    <input type="radio" id="funcionario" name="perfil" value="funcionário">
                     <label for="funcionario">Funcionário</label>
                 </div>
                 <div>

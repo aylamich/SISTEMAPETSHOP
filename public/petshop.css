@@ -3,6 +3,39 @@ body {
     background-color: #ffffff;
     margin: 0;
     padding: 0;
+    background-image: url('fundo2.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    
+    /* Centraliza a imagem de fundo */
+    background-position: center;
+    
+    /* Mantém a imagem fixa ao rolar a página */
+    background-attachment: fixed;
+    
+}
+
+.logo {
+    align-items: center;
+    justify-content: center;
+
+}
+
+.logo img {
+    width: 40px;
+    height: 40px;
+    margin-left: 48%;
+    margin-top: 10px;
+
+}
+
+.logo h1 {
+    font-family: "DynaPuff", system-ui;
+    margin: 0;
+    font-size: 2.5em;
+    color: #000000;
+    text-align: center;
+    margin-top: 40px;
 }
 
 .container {
@@ -10,10 +43,11 @@ body {
     justify-content: center;
     margin: 50px;
     padding: 20px;
-    background-color:  #ffffff;
+    background-color:  transparent;
     border-radius: 10px;
-    margin-top: 10%; 
+    margin-top:10px; 
     font-family: "Moderustic", sans-serif;
+    box-shadow: #000000;
 }
 
 .login {

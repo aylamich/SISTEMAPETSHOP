@@ -47,7 +47,7 @@ async function alterarcliente(idCliente, nome, contato, email, uf, idCidade, rua
     const sql = "UPDATE Cliente SET nomeCompleto = ? , contato  = ? , email = ? , rua = ? , numero = ? , bairro = ? , cep = ? , uf = ? , idCidade = ? WHERE id = ? "; 
 
     const values = [nome, contato, email, rua, numero, bairro, cep, uf, idCidade, idCliente];
-    //console.log(sql, values);
+    console.log(sql, values);
     await conn.execute(sql, values);
 }
 
@@ -248,12 +248,12 @@ async function alterarAnimal(idAnimal, nome, tipo, porte, sexo, cor, obs, idClie
     await conn.execute(sql, values);
 }
 
-async function cadastrarUsuario(idCliente, username, email, password, perfil){
+async function cadastrarUsuario(idCliente, username, email, password, tipoUsuario){
     
         const conn = await connect();
         const sql = "INSERT INTO Usuario (nomeCompleto, email, senha, tipoUsuario, idCliente) values (?, ?, ?, ?, ?) ";
     
-        const values = [username, email, password, perfil, idCliente];
+        const values = [username, email, password, tipoUsuario, idCliente];
         //console.log(sql, values);
         let resultado = await conn.query(sql, values).then(() => {
                                 console.log('Cadastro realizado com sucesso!');
@@ -298,7 +298,7 @@ async function consultaUsuarioPorId(id){
                     u.nomeCompleto AS nomeCompleto, 
                     u.email AS email,
                     u.senha AS senha,
-                    u.tipoUsuario AS perfil,
+                    u.tipoUsuario AS tipoUsuario,
                     c.id AS idCliente
                 FROM 
                     Usuario u
@@ -312,14 +312,14 @@ async function consultaUsuarioPorId(id){
     return resultado;
 }    
 
-async function alterarUsuario(username, email, password, perfil, idCliente, idUsuario){    
+async function alterarUsuario(username, email, password, tipoUsuario, idCliente, idUsuario){    
 
     const conn = await connect();
     idCliente = idCliente || null;
 
     const sql = "UPDATE Usuario SET nomeCompleto = ? , email = ? , senha = ?, tipoUsuario = ? , idCliente = ? WHERE id = ? "; 
 
-    const values = [username, email, password, perfil, idCliente, idUsuario]; // esse precisa seguir a ordem igual na tabela
+    const values = [username, email, password, tipoUsuario, idCliente, idUsuario]; // esse precisa seguir a ordem igual na tabela
     //console.log(sql, values);
     await conn.execute(sql, values);
 }

@@ -69,21 +69,61 @@
 
     }
 
-    function editarCliente(id) {
+    async function editarCliente(id) {
+        try {
+            const response = await fetch('/api/editarcliente', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+    
+            const data = await response.json();
+    
+            // Preencher os campos da tela cliente
+            document.getElementById('nome').value = data[0][0].nomeCompleto;
+            document.getElementById('contato').value = data[0][0].contato;
+            document.getElementById('email').value = data[0][0].email;
+            document.getElementById('uf').value = data[0][0].uf;
+    
+            // Usando await em selecionaUF() para garantir que a função termina antes de continuar
+            await selecionaUF();
+    
+            alert(data[0][0].idCidade);
+            alert(data[0][0].nomeCidade);
+            document.getElementById('cbcidade').value = data[0][0].idCidade;
+            document.getElementById('rua').value = data[0][0].rua;
+            document.getElementById('numero').value = data[0][0].numero;
+            document.getElementById('bairro').value = data[0][0].bairro;
+            document.getElementById('cep').value = data[0][0].cep;
+    
+        } catch (error) {
+            console.error('Erro:', error);
+        }
+    }
+    
+    /*
+     function editarCliente(id) {
         fetch('/api/editarcliente', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id })
         })
+    
             .then(response => response.json())
-            .then(data => {
+            .then(data  => {
                 // Preencher os campos da tela cliente
+                const idCidade = document.getElementById('cbcidade').value;
+    
                 
                 document.getElementById('nome').value = data[0][0].nomeCompleto;
                 document.getElementById('contato').value = data[0][0].contato;
                 document.getElementById('email').value = data[0][0].email;
                 document.getElementById('uf').value = data[0][0].uf;
+                 selecionaUF();
+                alert(data[0][0].idCidade)
+                alert(data[0][0].nomeCidade);
                 document.getElementById('cbcidade').value = data[0][0].idCidade;
+               
                 document.getElementById('rua').value = data[0][0].rua;
                 document.getElementById('numero').value = data[0][0].numero;
                 document.getElementById('bairro').value = data[0][0].bairro;
@@ -91,18 +131,19 @@
             })
             .catch(error => console.error('Erro:', error));
     }
+            */
 
-    function selecionaUF() {
+    async function selecionaUF() {
 
         const ufSelecionado = document.getElementById('uf').value;
-        fetch('/api/consultacidadeporUF', {
+        await fetch('/api/consultacidadeporUF', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ufSelecionado})
         }).then(response => response.json()).then(data => {
 
-
-            const comboBoxCidade = document.getElementById('cbcidade');
+            alert("CHEGOU NO SELECIONAR UF");
+                const comboBoxCidade = document.getElementById('cbcidade');
                 // Limpa a lista de cidades
                 comboBoxCidade.innerHTML = '';
 
@@ -113,7 +154,8 @@
                   option.text =  cidade.nomeCidade;  
                   comboBoxCidade.appendChild(option);  
 
-                  });
+                  });  
+                  alert("SAINDO DO SELECIONAR UF");       
             })
             .catch(error => console.error('Erro:', error));
 
@@ -162,11 +204,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="paw.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=DynaPuff:wght@400..700&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Moderustic:wght@300..800&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Tiny5&display=swap" rel="stylesheet">
     <title>Cadastro Clientes</title>
     <link rel="stylesheet" href="cadastrocliente.css">
 </head>
 <body>
-    <div class="navbar">
+    <div class="header">
+        <div class="logo">
+          <h1>PETTOPIA</h1>
+          <img src="petshop.png">
+        </div>
+      <div class="navbar-container">  
+        <div class="navbar">
         <a href="funcionario.html">Home</a>
         <a id="telaCliente" href="consultacliente.html">Cliente</a>
         <a id="telaAnimal" href="consultaanimal.html">Animal</a>
@@ -174,6 +223,8 @@
         <a id="telaUsuario" href="consultausuario.html">Usuário</a>
         <a onclick="sair()">Sair</a>
     </div>
+  </div>
+</div>
 
     <h1>CLIENTES</h1>
 

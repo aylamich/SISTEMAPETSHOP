@@ -44,6 +44,7 @@ app.post('/api/cadastrocliente', (req, res) => {
     const {idCliente, nome, contato, email, uf, idCidade, rua, numero, bairro, cep} = req.body;
     
     db.alterarcliente(idCliente, nome, contato, email, uf, idCidade, rua, numero, bairro, cep);
+    console.log(idCidade);
     
     res.send(`Nome: ${nome}`);
 
@@ -150,7 +151,7 @@ app.post('/api/excluiranimal', async (req, res) => {
 });  
 
 app.post('/api/cadastrousuario', (req, res) => {
-    let {idCliente, username, email, password, perfil} = req.body;
+    let {idCliente, username, email, password, tipoUsuario} = req.body;
     //console.log(username);
     //console.log(email);
     //console.log(password);
@@ -161,7 +162,7 @@ app.post('/api/cadastrousuario', (req, res) => {
       idCliente = null;
     }
 
-    db.cadastrarUsuario(idCliente, username, email, password, perfil);
+    db.cadastrarUsuario(idCliente, username, email, password, tipoUsuario);
 
     res.send(`Username: ${username}`);
 });	    
@@ -186,13 +187,11 @@ app.post('/api/excluirusuario', (req, res) => {
 });
 
 app.post('/api/alterarusuario', (req, res) => {
-  const { username, email, password, perfil, idCliente, idUsuario } = req.body;
+  const { username, email, password, tipoUsuario, idCliente, idUsuario } = req.body;
   //console.log("Chegou no ALTERAR AAAAAAAAA");
   
-  db.alterarUsuario( username, email, password, perfil, idCliente, idUsuario);
-  //console.log("Chegou no alterar usuario");
-  
-  
+  db.alterarUsuario( username, email, password, tipoUsuario, idCliente, idUsuario);
+
   res.send('');
 });
 
