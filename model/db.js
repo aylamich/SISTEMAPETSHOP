@@ -74,7 +74,7 @@ async function consultaCliente(paginaAtual, registrosPorPagina){
                     c.idCidade = ci.id 
                     
                 ORDER BY 
-                    c.nomeCompleto ASC`;    ;
+                    TRIM(c.nomeCompleto) ASC`;    ;
 
         let values = [];            
         if (paginaAtual != null && registrosPorPagina != null) {
@@ -172,12 +172,13 @@ async function consultaAnimal(paginaAtual, registrosPorPagina){
                     Cliente c 
                 WHERE
                     a.idCliente = c.id
-                `;
+                ORDER BY 
+                    TRIM(c.nomeCompleto) ASC`;
                 
     let values = [];
 
     if (paginaAtual != null&& registrosPorPagina != null) {
-        sql += 'LIMIT ? OFFSET ?';
+        sql += ' LIMIT ? OFFSET ?';
         values = [registrosPorPagina, paginaAtual];
     } 
 
@@ -277,12 +278,13 @@ async function consultaUsuario(paginaAtual, registrosPorPagina){
                     Usuario u
                 LEFT JOIN 
                     Cliente c ON u.idCliente = c.id
-                `;
+                ORDER BY 
+                    TRIM(u.nomeCompleto) ASC`;
 
                 let values = [];
 
                 if (paginaAtual != null&& registrosPorPagina != null) {
-                    sql += 'LIMIT ? OFFSET ?';
+                    sql += ' LIMIT ? OFFSET ?';
                     values = [registrosPorPagina, paginaAtual];
                 } 
 
@@ -384,6 +386,7 @@ async function consultaAgenda( paginaAtual, registrosPorPagina, idCliente){
                 if(idCliente!=null&&idCliente!=''){
                     sql += ' AND c.id = ? ';
                 }
+                sql += ' ORDER BY g.dataAgenda, g.horarioInicio ';
                 if(paginaAtual!=null&& registrosPorPagina!=null){
                     sql += ' LIMIT ? OFFSET ? ';
                     if(idCliente!=null){
